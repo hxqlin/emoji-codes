@@ -1,7 +1,7 @@
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const path = require("path");
 
-module.exports = {
+const config = {
   devtool: "cheap-module-source-map",
   context: __dirname,
   entry: "./src/index.js",
@@ -16,12 +16,8 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.(js|jsx)$/,
         use: "babel-loader",
-      },
-      {
-        test: /\.jsx?$/,
-        loader: "babel-loader",
         exclude: /node_modules/,
       },
       {
@@ -30,23 +26,7 @@ module.exports = {
       },
       {
         test: /\.less$/,
-        use: [
-          {
-            loader: "style-loader",
-          },
-          {
-            loader: "css-loader",
-          },
-          {
-            loader: "less-loader",
-            options: {
-              lessOptions: {
-                strictMath: true,
-                noIeCompat: true,
-              },
-            },
-          },
-        ],
+        use: ["style-loader", "css-loader", "less-loader"],
       },
       {
         test: /\.(png|j?g|svg|gif)?$/,
@@ -64,3 +44,5 @@ module.exports = {
     extensions: [".js", ".jsx", ".json"],
   },
 };
+
+module.exports = config;
