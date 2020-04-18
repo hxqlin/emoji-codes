@@ -1,50 +1,66 @@
-const HtmlWebPackPlugin = require( 'html-webpack-plugin' );
-const path = require('path');
+const HtmlWebPackPlugin = require("html-webpack-plugin");
+const path = require("path");
 
 module.exports = {
-  devtool: 'cheap-module-source-map',
+  devtool: "cheap-module-source-map",
   context: __dirname,
-  entry: './src/index.js',
+  entry: "./src/index.js",
   output: {
-    path: path.join(__dirname, '/dist'),
-    filename: '[name].bundle.js',
-    publicPath: '/',
+    path: path.join(__dirname, "/dist"),
+    filename: "[name].bundle.js",
+    publicPath: "/",
   },
   devServer: {
-    historyApiFallback: true
+    historyApiFallback: true,
   },
   module: {
     rules: [
       {
         test: /\.js$/,
-        use: 'babel-loader',
+        use: "babel-loader",
       },
       {
         test: /\.jsx?$/,
-        loader: 'babel-loader',
+        loader: "babel-loader",
         exclude: /node_modules/,
       },
       {
         test: /\.css$/i,
-        use: ['style-loader', 'css-loader'],
+        use: ["style-loader", "css-loader"],
       },
       {
         test: /\.less$/,
-        loader: 'style-loader!css-loader!less-loader',
+        use: [
+          {
+            loader: "style-loader",
+          },
+          {
+            loader: "css-loader",
+          },
+          {
+            loader: "less-loader",
+            options: {
+              lessOptions: {
+                strictMath: true,
+                noIeCompat: true,
+              },
+            },
+          },
+        ],
       },
       {
         test: /\.(png|j?g|svg|gif)?$/,
-        use: 'file-loader'
-     }
+        use: "file-loader",
+      },
     ],
   },
   plugins: [
     new HtmlWebPackPlugin({
-       template: path.resolve( __dirname, 'public/index.html' ),
-       filename: 'index.html'
-    })
+      template: path.resolve(__dirname, "public/index.html"),
+      filename: "index.html",
+    }),
   ],
   resolve: {
-    extensions: ['.js', '.jsx', '.json'],
+    extensions: [".js", ".jsx", ".json"],
   },
 };

@@ -25,11 +25,3 @@
     transform: rotate(360deg);
   }
 }
-
-.editor {
-  width: 500px;
-  height: 200px;
-  background-color: white;
-  color: black;
-  text-align: left;
-}

@@ -1,0 +1,40 @@
+.editor {
+  width: 500px;
+  height: 200px;
+  background-color: white;
+  color: black;
+  text-align: left;
+}
+
+.emoji-container {
+  box-sizing: border-box;
+  user-select: text;
+  width: 100%;
+  box-shadow: 0 0 0 1px lightgray, 0 4px 12px 0 rgba(0, 0, 0, 0.08);
+  background: white;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.4rem;
+  max-height: 220px;
+  max-width: 540px;
+  min-width: 420px;
+  overflow: hidden;
+}
+
+.emoji-list {
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  & ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+.emoji-list-item {
+  box-sizing: border-box;
+  cursor: pointer;
+  padding: 2px 6px;
+}
