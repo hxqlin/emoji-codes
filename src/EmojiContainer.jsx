@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import { emojiIndex } from "emoji-mart-lite";
+import EmojiList from "./EmojiList.jsx";
 import PropTypes from "prop-types";
 
 const propTypes = {
@@ -11,7 +13,7 @@ class EmojiContainer extends Component {
 
     this.state = {
       text: this.props.editor.textContent,
-      showEmojis: false,
+      emojis: [],
     };
   }
 
@@ -25,11 +27,26 @@ class EmojiContainer extends Component {
 
   _setupObserver() {
     const callback = (mutations) => {
-      const maybeNewText = mutations[mutations.length - 1].target.textContent;
-      if (maybeNewText !== this.state.text) {
-        this.setState({
-          text: maybeNewText,
-        });
+      const characterDataMutations = mutations.filter(
+        (m) => m.type === "characterData"
+      );
+
+      if (characterDataMutations.length) {
+        const maybeNewText =
+          characterDataMutations[characterDataMutations.length - 1].target
+            .textContent;
+
+        if (maybeNewText !== this.state.text) {
+          const emojis = emojiIndex.search(maybeNewText) || [];
+          this.setState({
+            text: maybeNewText,
+            emojis: emojis.map((o) => ({
+              id: o.id,
+              colons: o.colons,
+              native: o.native,
+            })),
+          });
+        }
       }
     };
 
@@ -45,7 +62,13 @@ class EmojiContainer extends Component {
   }
 
   render() {
-    return <div className="emoji-container"></div>;
+    const showEmojis = this.state.emojis.length;
+
+    return (
+      <div className={`emoji-container ${showEmojis ? "" : "-is-hidden"}`}>
+        {showEmojis && <EmojiList emojis={this.state.emojis} />}
+      </div>
+    );
   }
 }
 
