@@ -15,6 +15,9 @@ class EmojiContainer extends Component {
       text: this.props.editor.textContent,
       emojis: [],
     };
+
+    this.onEmojiClick = this.onEmojiClick.bind(this);
+    this._setupObserver = this._setupObserver.bind(this);
   }
 
   componentDidMount() {
@@ -23,6 +26,19 @@ class EmojiContainer extends Component {
 
   componentWillUnmount() {
     this.observer.disconnect();
+  }
+
+  onEmojiClick(e) {
+    this.props.editor.focus();
+
+    const index = parseInt(e.target.getAttribute("data-index"));
+    const emoji = this.state.emojis[index].native;
+
+    this.props.editor.textContent = emoji;
+
+    this.setState({
+      emojis: [],
+    });
   }
 
   _setupObserver() {
@@ -62,11 +78,16 @@ class EmojiContainer extends Component {
   }
 
   render() {
-    const showEmojis = this.state.emojis.length;
+    const showEmojis = this.state.emojis.length > 0;
 
     return (
       <div className={`emoji-container ${showEmojis ? "" : "-is-hidden"}`}>
-        {showEmojis && <EmojiList emojis={this.state.emojis} />}
+        {showEmojis && (
+          <EmojiList
+            emojis={this.state.emojis}
+            onEmojiClick={this.onEmojiClick}
+          />
+        )}
       </div>
     );
   }
