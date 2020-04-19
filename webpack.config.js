@@ -4,7 +4,9 @@ const path = require("path");
 const config = {
   devtool: "cheap-module-source-map",
   context: __dirname,
-  entry: "./src/index.js",
+  entry: {
+    content: "./src/content.jsx",
+  },
   output: {
     path: path.join(__dirname, "/dist"),
     filename: "[name].bundle.js",

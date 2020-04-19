@@ -1,0 +1,14 @@
+{
+  "name": "emoji-codes",
+  "manifest_version": 2,
+  "version": "0.1",
+  "content_scripts": [
+    {
+      "matches": ["https://www.facebook.com/messages/*"],
+      "all_frames": true,
+      "js": ["content.bundle.js"]
+    }
+  ],
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+  "permissions": ["tabs", "http://*/", "https://*/"]
+}
