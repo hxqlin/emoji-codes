@@ -18,12 +18,14 @@ class EmojiPicker extends Component {
 
     this.state = {
       cursor: 0,
+      activeEmojiIndex: 0,
       text: this.props.editor.textContent,
       emojis: [],
     };
 
     this.getEmojis = this.getEmojis.bind(this);
     this.onEmojiClick = this.onEmojiClick.bind(this);
+    this.onEmojiHover = this.onEmojiHover.bind(this);
     this.shouldSearchEmojis = this.shouldSearchEmojis.bind(this);
     this._setupObserver = this._setupObserver.bind(this);
   }
@@ -82,6 +84,19 @@ class EmojiPicker extends Component {
 
     this.setState({
       emojis: [],
+    });
+  }
+
+  /**
+   * Handler for when an emoji in the emoji list is hovered over.
+   *
+   * @param {Event} e The event that triggered the callback.
+   */
+  onEmojiHover(e) {
+    const emojiIndex = parseInt(e.target.getAttribute("data-index"));
+
+    this.setState({
+      activeEmojiIndex: emojiIndex,
     });
   }
 
@@ -214,8 +229,10 @@ class EmojiPicker extends Component {
       >
         {showEmojis && (
           <EmojiList
+            activeEmojiIndex={this.state.activeEmojiIndex}
             emojis={this.state.emojis}
             onEmojiClick={this.onEmojiClick}
+            onEmojiHover={this.onEmojiHover}
           />
         )}
       </div>

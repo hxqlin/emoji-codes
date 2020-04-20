@@ -2,22 +2,34 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 
 const propTypes = {
-  emojis: PropTypes.array.isRequired,
+  activeEmojiIndex: PropTypes.number.isRequired,
+  emojis: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      colons: PropTypes.string.isRequired,
+      native: PropTypes.string.isRequired,
+    })
+  ).isRequired,
   onEmojiClick: PropTypes.func.isRequired,
+  onEmojiHover: PropTypes.func.isRequired,
 };
 
+/**
+ * Component that displays a list of emojis and their codes.
+ */
 class EmojiList extends Component {
   constructor(props) {
     super(props);
 
-    this.emojiItems = [];
+    this.emojiNodes = [];
 
+    this.isEmojiActive = this.isEmojiActive.bind(this);
     this._addEventListeners = this._addEventListeners.bind(this);
     this._removeEventListeners = this._removeEventListeners.bind(this);
   }
 
   componentDidMount() {
-    this.emojiItems = this.emojiList.childNodes;
+    this.emojiNodes = this.emojiList.childNodes;
 
     this._addEventListeners();
   }
@@ -29,20 +41,24 @@ class EmojiList extends Component {
   componentDidUpdate() {
     this._removeEventListeners();
 
-    this.emojiItems = this.emojiList.childNodes;
+    this.emojiNodes = this.emojiList.childNodes;
 
     this._addEventListeners();
   }
 
+  isEmojiActive(index) {
+    return index === this.props.activeEmojiIndex;
+  }
+
   _addEventListeners() {
-    for (let emojiItem of this.emojiItems) {
-      emojiItem.addEventListener("click", this.props.onEmojiClick);
+    for (let emojiNode of this.emojiNodes) {
+      emojiNode.addEventListener("click", this.props.onEmojiClick);
     }
   }
 
   _removeEventListeners() {
-    for (let emojiItem of this.emojiItems) {
-      emojiItem.removeEventListener("click", this.props.onEmojiClick);
+    for (let emojiNode of this.emojiNodes) {
+      emojiNode.removeEventListener("click", this.props.onEmojiClick);
     }
   }
 
@@ -55,7 +71,14 @@ class EmojiList extends Component {
           }}
         >
           {this.props.emojis.map((emoji, index) => (
-            <li key={emoji.id} className="emoji-list-item" data-index={index}>
+            <li
+              className={`emoji-list__item ${
+                this.isEmojiActive(index) ? "-is-active" : ""
+              }`}
+              data-index={index}
+              key={emoji.id}
+              onMouseOver={this.props.onEmojiHover}
+            >
               {emoji.native} {emoji.colons}
             </li>
           ))}
