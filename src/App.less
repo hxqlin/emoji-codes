@@ -42,14 +42,15 @@ code {
 }
 
 .editor {
-  width: 500px;
-  height: 200px;
+  width: 400px;
+  height: 36px;
   background-color: white;
   color: black;
   text-align: left;
+  padding: 9px 0px;
 }
 
-.emoji-container {
+.emoji-picker {
   box-sizing: border-box;
   user-select: text;
   width: 100%;
@@ -60,9 +61,10 @@ code {
   flex-direction: column;
   line-height: 1.4rem;
   max-height: 220px;
-  max-width: 540px;
-  min-width: 420px;
+  max-width: min-content;
+  min-width: 400px;
   overflow: hidden;
+  position: absolute;
 
   &.-is-hidden {
     display: none;
@@ -70,8 +72,10 @@ code {
 }
 
 .emoji-list {
+  color: black;
   overflow-x: hidden;
   overflow-y: auto;
+  text-align: left;
 
   & ul {
     list-style-type: none;

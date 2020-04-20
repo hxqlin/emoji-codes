@@ -12,7 +12,7 @@ const propTypes = {
  * Component that watches for changes in a contenteditable field
  * to show a list of emojis if an emoji code is used.
  */
-class EmojiContainer extends Component {
+class EmojiPicker extends Component {
   constructor(props) {
     super(props);
 
@@ -34,6 +34,17 @@ class EmojiContainer extends Component {
 
   componentWillUnmount() {
     this.observer.disconnect();
+  }
+
+  componentDidUpdate() {
+    const height = this.emojiPicker.clientHeight;
+    const top = height * -1;
+
+    if (top !== this.state.top) {
+      this.setState({
+        top: top,
+      });
+    }
   }
 
   /**
@@ -190,9 +201,17 @@ class EmojiContainer extends Component {
 
   render() {
     const showEmojis = this.state.emojis.length > 0;
-
+    const emojiPickerStyle = {
+      top: `${this.state.top}px`,
+    };
     return (
-      <div className={`emoji-container ${showEmojis ? "" : "-is-hidden"}`}>
+      <div
+        className={`emoji-picker ${showEmojis ? "" : "-is-hidden"}`}
+        ref={(node) => {
+          this.emojiPicker = node;
+        }}
+        style={emojiPickerStyle}
+      >
         {showEmojis && (
           <EmojiList
             emojis={this.state.emojis}
@@ -204,6 +223,6 @@ class EmojiContainer extends Component {
   }
 }
 
-EmojiContainer.propTypes = propTypes;
+EmojiPicker.propTypes = propTypes;
 
-export default EmojiContainer;
+export default EmojiPicker;
