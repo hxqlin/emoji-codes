@@ -1,16 +1,20 @@
 {
-    "extends": ["eslint:recommended", "plugin:react/recommended"],
-    "parserOptions": {
-        "ecmaVersion": 6,
-        "sourceType": "module",
-        "ecmaFeatures": {
-          "jsx": true,
-          "modules": true,
-          "experimentalObjectRestSpread": true
-        }
-    },
-    "env": {
-        "browser": true,
-        "node": true
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:jsdoc/recommended"
+  ],
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true,
+      "modules": true,
+      "experimentalObjectRestSpread": true
     }
+  },
+  "env": {
+    "browser": true,
+    "node": true
+  }
 }
