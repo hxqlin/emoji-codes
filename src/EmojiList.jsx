@@ -72,8 +72,8 @@ class EmojiList extends Component {
         >
           {this.props.emojis.map((emoji, index) => (
             <li
-              className={`emoji-list__item ${
-                this.isEmojiActive(index) ? "-is-active" : ""
+              className={`emoji-list__item${
+                this.isEmojiActive(index) ? " -is-active" : ""
               }`}
               data-index={index}
               key={emoji.id}

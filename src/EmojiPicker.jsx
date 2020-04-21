@@ -26,12 +26,15 @@ class EmojiPicker extends Component {
     this.getEmojis = this.getEmojis.bind(this);
     this.onEmojiClick = this.onEmojiClick.bind(this);
     this.onEmojiHover = this.onEmojiHover.bind(this);
+    this.onKeyDown = this.onKeyDown.bind(this);
     this.shouldSearchEmojis = this.shouldSearchEmojis.bind(this);
     this._setupObserver = this._setupObserver.bind(this);
   }
 
   componentDidMount() {
     this._setupObserver();
+
+    this.props.editor.addEventListener("keydown", this.onKeyDown);
   }
 
   componentWillUnmount() {
@@ -50,11 +53,11 @@ class EmojiPicker extends Component {
   }
 
   /**
-   * Handler for when an emoji in the emoji list is clicked.
+   * Replaces an emoji code region with an emoji.
    *
-   * @param {Event} e The event that triggered the callback.
+   * @param {string} emoji The emoji to replace the emoji code with.
    */
-  onEmojiClick(e) {
+  replaceCode(emoji) {
     this.props.editor.focus();
 
     const selection = document.getSelection();
@@ -69,9 +72,6 @@ class EmojiPicker extends Component {
         break;
       }
     }
-
-    const emojiIndex = parseInt(e.target.getAttribute("data-index"));
-    const emoji = this.state.emojis[emojiIndex].native;
 
     const range = document.createRange();
     range.setStart(focusNode, startColon);
@@ -88,6 +88,18 @@ class EmojiPicker extends Component {
   }
 
   /**
+   * Handler for when an emoji in the emoji list is clicked.
+   *
+   * @param {Event} e The event that triggered the callback.
+   */
+  onEmojiClick(e) {
+    const emojiIndex = parseInt(e.target.getAttribute("data-index"));
+    const emoji = this.state.emojis[emojiIndex].native;
+
+    this.replaceCode(emoji);
+  }
+
+  /**
    * Handler for when an emoji in the emoji list is hovered over.
    *
    * @param {Event} e The event that triggered the callback.
@@ -98,6 +110,102 @@ class EmojiPicker extends Component {
     this.setState({
       activeEmojiIndex: emojiIndex,
     });
+  }
+
+  /**
+   * Handler for when a key is pressed in the editor.
+   *
+   * If the emoji picker is visible, pressing the up or down arrow keys
+   * will change the currently selected emoji, pressing the escape key
+   * will hide the emoji picker, and pressing the enter or tab key will
+   * insert the currently selected emoji.
+   *
+   * If the right or left arrow keys are pressed, the new cursor position
+   * and current text content is used to determine whether the emoji picker
+   * should be shown.
+   *
+   * @param {Event} e The event that triggered the callback.
+   */
+  onKeyDown(e) {
+    const isVisible = this.state.emojis.length > 0;
+
+    let newActiveEmojiIndex;
+
+    switch (e.key) {
+      case "ArrowUp":
+        if (isVisible) {
+          e.preventDefault();
+          e.stopPropagation();
+
+          if (this.state.activeEmojiIndex === 0) {
+            newActiveEmojiIndex = this.state.emojis.length - 1;
+          } else {
+            newActiveEmojiIndex = this.state.activeEmojiIndex - 1;
+          }
+
+          this.setState({
+            activeEmojiIndex: newActiveEmojiIndex,
+          });
+        }
+        break;
+      case "ArrowDown":
+        if (isVisible) {
+          e.preventDefault();
+          e.stopPropagation();
+
+          if (this.state.activeEmojiIndex === this.state.emojis.length - 1) {
+            newActiveEmojiIndex = 0;
+          } else {
+            newActiveEmojiIndex = this.state.activeEmojiIndex + 1;
+          }
+
+          this.setState({
+            activeEmojiIndex: newActiveEmojiIndex,
+          });
+        }
+        break;
+      case "ArrowLeft":
+      case "ArrowRight":
+        const selection = document.getSelection();
+        let cursor = selection.focusOffset;
+        const text = selection.focusNode.wholeText;
+
+        if (e.key === "ArrowLeft") {
+          cursor--;
+        } else {
+          cursor++;
+        }
+
+        if (!this.shouldSearchEmojis(cursor, text)) {
+          this.setState({
+            emojis: [],
+          });
+        } else {
+          this.setState({
+            cursor: cursor,
+            emojis: this.getEmojis(cursor, text),
+          });
+        }
+        break;
+      case "Enter":
+      case "Tab":
+        if (isVisible) {
+          e.preventDefault();
+          e.stopPropagation();
+
+          const emoji = this.state.emojis[this.state.activeEmojiIndex].native;
+          this.replaceCode(emoji);
+        }
+      case "Escape":
+        if (isVisible) {
+          e.preventDefault();
+          e.stopPropagation();
+
+          this.setState({
+            emojis: [],
+          });
+        }
+    }
   }
 
   /**
@@ -219,6 +327,7 @@ class EmojiPicker extends Component {
     const emojiPickerStyle = {
       top: `${this.state.top}px`,
     };
+
     return (
       <div
         className={`emoji-picker ${showEmojis ? "" : "-is-hidden"}`}
