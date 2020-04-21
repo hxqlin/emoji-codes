@@ -44,6 +44,11 @@ class EmojiList extends Component {
     this.emojiNodes = this.emojiList.childNodes;
 
     this._addEventListeners();
+
+    const activeEmojiNode = this.emojiNodes.item(this.props.activeEmojiIndex);
+    if (activeEmojiNode) {
+      activeEmojiNode.scrollIntoViewIfNeeded(false);
+    }
   }
 
   isEmojiActive(index) {
