@@ -213,9 +213,11 @@ class EmojiPicker extends Component {
    *
    * @param {number} cursor The current cursor position.
    * @param {string} text The text to search.
+   * @throws {Error} Will throw an error if the start of the emoji text was
+   *                 not found.
    */
   getEmojiText(cursor, text) {
-    let emojiStart = 0;
+    let emojiStart = null;
 
     for (let i = cursor - 1; i >= 0; i -= 1) {
       const char = text.charAt(i);
@@ -227,6 +229,10 @@ class EmojiPicker extends Component {
           emojiStart = i + 1;
         }
       }
+    }
+
+    if (emojiStart === null) {
+      throw new Error("Start of emoji text was not found");
     }
 
     return text.substring(emojiStart, cursor);
@@ -270,17 +276,20 @@ class EmojiPicker extends Component {
    */
   getEmojis(cursor, text) {
     if (this.shouldSearchEmojis(cursor, text)) {
-      const textToSearch = this.getEmojiText(cursor, text) || ":";
-      const emojis = emojiIndex.search(textToSearch) || [];
+      const textToSearch = this.getEmojiText(cursor, text);
 
-      return emojis.map((o) => ({
-        id: o.id,
-        colons: o.colons,
-        native: o.native,
-      }));
-    } else {
-      return [];
+      if (textToSearch !== ":") {
+        const emojis = emojiIndex.search(textToSearch) || [];
+
+        return emojis.map((o) => ({
+          id: o.id,
+          colons: o.colons,
+          native: o.native,
+        }));
+      }
     }
+
+    return [];
   }
 
   /**
