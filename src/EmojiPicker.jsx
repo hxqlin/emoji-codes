@@ -27,7 +27,7 @@ class EmojiPicker extends Component {
     this.onEmojiClick = this.onEmojiClick.bind(this);
     this.onEmojiHover = this.onEmojiHover.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
-    this.shouldSearchEmojis = this.shouldSearchEmojis.bind(this);
+    this.isInEmojiCode = this.isInEmojiCode.bind(this);
     this._setupObserver = this._setupObserver.bind(this);
   }
 
@@ -66,7 +66,13 @@ class EmojiPicker extends Component {
 
     let startColon;
 
-    for (let i = this.state.cursor - 1; i >= 0; i -= 1) {
+    for (
+      let i = this.isCompleteEmojiCode(this.state.cursor, text)
+        ? this.state.cursor - 2
+        : this.state.cursor - 1;
+      i >= 0;
+      i -= 1
+    ) {
       if (text.charAt(i) === ":") {
         startColon = i;
         break;
@@ -83,6 +89,7 @@ class EmojiPicker extends Component {
     document.execCommand("insertText", true, emoji + " ");
 
     this.setState({
+      activeEmojiIndex: 0,
       emojis: [],
     });
   }
@@ -176,8 +183,9 @@ class EmojiPicker extends Component {
           cursor++;
         }
 
-        if (!this.shouldSearchEmojis(cursor, text)) {
+        if (!this.isInEmojiCode(cursor, text)) {
           this.setState({
+            activeEmojiIndex: 0,
             emojis: [],
           });
         } else {
@@ -202,6 +210,7 @@ class EmojiPicker extends Component {
           e.stopPropagation();
 
           this.setState({
+            activeEmojiIndex: 0,
             emojis: [],
           });
         }
@@ -235,28 +244,53 @@ class EmojiPicker extends Component {
       throw new Error("Start of emoji text was not found");
     }
 
-    return text.substring(emojiStart, cursor);
+    const emojiText = text.substring(emojiStart, cursor);
+
+    return emojiText.endsWith(":") ? emojiText.slice(0, -1) : emojiText;
   }
 
   /**
-   * Whether an emoji lookup should be performed.
+   * Whether the cursor is positioned after a complete emoji code.
    *
-   * An emoji lookup should be performed if there is a ":" character
-   * preceded by whitespace before the cursor position. The whitespace
-   * is not required if the cursor is at the beginning of the text.
+   * Returns true if there is a ":" character followed by some characters
+   * and another ":" before the cursor position.
    *
    * @param {number} cursor The current cursor position.
    * @param {string} text The text to search.
-   * @returns {boolean} Whether to perform an emoji lookup.
+   * @returns {boolean}
    */
-  shouldSearchEmojis(cursor, text) {
+  isCompleteEmojiCode(cursor, text) {
+    return (
+      cursor !== 0 &&
+      text[cursor - 1] === ":" &&
+      this.isInEmojiCode(cursor - 1, text)
+    );
+  }
+
+  /**
+   * Whether the cursor is within a possible emoji code.
+   *
+   * Returns true if there is a ":" character preceded by whitespace
+   * before the cursor position. If there is a ":" at the current
+   * cursor position, it's ignored. The whitespace is not required if
+   * the cursor is at the beginning of the text.
+   *
+   * @param {number} cursor The current cursor position.
+   * @param {string} text The text to search.
+   * @returns {boolean}
+   */
+  isInEmojiCode(cursor, text) {
     for (let i = cursor - 1; i >= 0; i -= 1) {
       const char = text.charAt(i);
 
       if (isWhitespace(char)) {
         return false;
       } else if (char === ":") {
-        return i === 0 || isWhitespace(text.charAt(i - 1));
+        if (i === cursor - 1) {
+          continue;
+        } else {
+          return i === 0 || isWhitespace(text.charAt(i - 1));
+        }
       }
     }
 
@@ -275,7 +309,7 @@ class EmojiPicker extends Component {
    * @returns {Array<Object>} An array of emoji objects.
    */
   getEmojis(cursor, text) {
-    if (this.shouldSearchEmojis(cursor, text)) {
+    if (this.isInEmojiCode(cursor, text)) {
       const textToSearch = this.getEmojiText(cursor, text);
 
       if (textToSearch !== ":") {
@@ -310,12 +344,22 @@ class EmojiPicker extends Component {
           const selection = document.getSelection();
           const cursor = selection.focusOffset;
           const text = selection.focusNode.wholeText;
+          const emojis = this.getEmojis(cursor, text);
 
           this.setState({
             cursor: cursor,
             text: maybeNewText,
-            emojis: this.getEmojis(cursor, text),
+            emojis: emojis,
           });
+
+          if (this.isCompleteEmojiCode(cursor, text)) {
+            const emojiText = this.getEmojiText(cursor, text);
+            const emoji = emojis.find((o) => o.id === emojiText);
+
+            if (emoji) {
+              this.replaceCode(emoji.native);
+            }
+          }
         }
       }
     };
