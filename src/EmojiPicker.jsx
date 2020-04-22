@@ -42,13 +42,31 @@ class EmojiPicker extends Component {
   }
 
   componentDidUpdate() {
-    const height = this.emojiPicker.clientHeight;
-    const top = height * -1;
+    /*
+     * If a chat element is provided, the component is being used
+     * on Facebook Messenger so the `top` attribute needs to be set
+     * relative to other elements on the page and not just the emoji
+     * picker height.
+     */
+    if (this.props.chat) {
+      const chatHeight = this.props.chat.clientHeight;
+      const emojiPickerHeight = this.emojiPicker.clientHeight;
+      const top = chatHeight - emojiPickerHeight - 60;
 
-    if (top !== this.state.top) {
-      this.setState({
-        top: top,
-      });
+      if (top !== this.state.top) {
+        this.setState({
+          top: top,
+        });
+      }
+    } else {
+      const height = this.emojiPicker.clientHeight;
+      const top = height * -1;
+
+      if (top !== this.state.top) {
+        this.setState({
+          top: top,
+        });
+      }
     }
   }
 
@@ -379,6 +397,7 @@ class EmojiPicker extends Component {
     const showEmojis = this.state.emojis.length > 0;
     const emojiPickerStyle = {
       top: `${this.state.top}px`,
+      left: this.props.chat ? "32px" : 0,
     };
 
     return (
