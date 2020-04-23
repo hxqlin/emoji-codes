@@ -27,6 +27,7 @@ class EmojiPicker extends Component {
     this.onEmojiClick = this.onEmojiClick.bind(this);
     this.onEmojiHover = this.onEmojiHover.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
+    this.onEditorChange = this.onEditorChange.bind(this);
     this.isInEmojiCode = this.isInEmojiCode.bind(this);
     this._setupObserver = this._setupObserver.bind(this);
   }
@@ -35,10 +36,14 @@ class EmojiPicker extends Component {
     this._setupObserver();
 
     this.props.editor.addEventListener("keydown", this.onKeyDown);
+    this.props.editor.addEventListener("click", this.onEditorChange);
   }
 
   componentWillUnmount() {
     this.observer.disconnect();
+
+    this.props.editor.removeEventListener("keydown");
+    this.props.editor.removeEventListener("click");
   }
 
   componentDidUpdate() {
@@ -345,6 +350,30 @@ class EmojiPicker extends Component {
   }
 
   /**
+   * Updates state when the editor changes.
+   */
+  onEditorChange() {
+    const selection = document.getSelection();
+    const cursor = selection.focusOffset;
+    const text = selection.focusNode.wholeText;
+    const emojis = this.getEmojis(cursor, text);
+
+    this.setState({
+      cursor: cursor,
+      emojis: emojis,
+    });
+
+    if (this.isCompleteEmojiCode(cursor, text)) {
+      const emojiText = this.getEmojiText(cursor, text);
+      const emoji = emojis.find((o) => o.id === emojiText);
+
+      if (emoji) {
+        this.replaceCode(emoji.native);
+      }
+    }
+  }
+
+  /**
    * Set up an observer on the editor to watch for changes.
    */
   _setupObserver() {
@@ -359,25 +388,11 @@ class EmojiPicker extends Component {
             .textContent;
 
         if (maybeNewText !== this.state.text) {
-          const selection = document.getSelection();
-          const cursor = selection.focusOffset;
-          const text = selection.focusNode.wholeText;
-          const emojis = this.getEmojis(cursor, text);
+          this.onEditorChange();
 
           this.setState({
-            cursor: cursor,
             text: maybeNewText,
-            emojis: emojis,
           });
-
-          if (this.isCompleteEmojiCode(cursor, text)) {
-            const emojiText = this.getEmojiText(cursor, text);
-            const emoji = emojis.find((o) => o.id === emojiText);
-
-            if (emoji) {
-              this.replaceCode(emoji.native);
-            }
-          }
         }
       }
     };
