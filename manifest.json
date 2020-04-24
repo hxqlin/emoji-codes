@@ -4,7 +4,7 @@
   "version": "0.1",
   "content_scripts": [
     {
-      "matches": ["https://www.facebook.com/messages/*"],
+      "matches": ["https://www.facebook.com/*", "https://www.messenger.com/*"],
       "all_frames": true,
       "js": ["content.bundle.js"]
     }

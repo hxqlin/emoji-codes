@@ -4,42 +4,88 @@ import EmojiPicker from "./EmojiPicker";
 import "./App.less";
 
 /*
- * Injects an emoji picker into the current conversation.
+ * Appends an emoji picker to a node.
+ *
+ * This function should be called with a node matching the selector
+ * "div[aria-label='New message']" for a Messenger conversation or
+ * a child of "[id=ChatTabsPagelet]" with class name "opened" for a
+ * Facebook chat tab.
  */
-const injectEmojiPicker = () => {
-  setTimeout(() => {
-    const chat = document.querySelector('div[role="main"]');
-    chat.style.position = "relative";
+const injectEmojiPicker = (parent) => {
+  const emojiContainer = document.createElement("div");
+  emojiContainer.classList.add("emoji-container");
+  parent.appendChild(emojiContainer);
 
-    const emojiContainer = document.createElement("div");
-    emojiContainer.classList.add("emoji-container");
+  const editor = document.querySelector(
+    "div[contenteditable=true][role=combobox]"
+  );
 
-    const editor = document.querySelector(
-      "div[contenteditable=true][role=combobox]"
-    );
-
-    chat.appendChild(emojiContainer);
-    ReactDOM.render(
-      <EmojiPicker chat={chat} editor={editor} />,
-      emojiContainer
-    );
-  }, 0);
+  ReactDOM.render(
+    <EmojiPicker editor={editor} parent={parent} />,
+    emojiContainer
+  );
 };
 
 /*
- * Set up an emoji picker for the current conversation and
- * attach listener for changes to the conversation.
+ * Set up emoji pickers for Messenger.
+ *
+ * Injects an emoji picker into the current conversation and attaches
+ * a listener for clicks on the conversation list to inject additional
+ * emoji pickers if the current conversation changes.
  */
-const setupEmojiPicker = () => {
-  injectEmojiPicker();
+const setupMessengerEmojiPicker = () => {
+  const currentMessage = document.querySelector(
+    "div[aria-label='New message']"
+  );
+  injectEmojiPicker(currentMessage);
 
-  /*
-   * When a different conversation is clicked, inject an emoji picker
-   * for the selected conversation.
-   */
-  const conversations = document.querySelector('div[role="main"]')
-    .previousSibling;
-  conversations.addEventListener("click", injectEmojiPicker);
+  const conversations = document.querySelector(
+    "ul[aria-label='Conversation List'"
+  );
+
+  conversations.addEventListener("click", () => {
+    setTimeout(() => {
+      const newMessage = document.querySelector(
+        "div[aria-label='New message']"
+      );
+      injectEmojiPicker(newMessage);
+    }, 0);
+  });
 };
 
-window.addEventListener("load", setupEmojiPicker);
+/*
+ * Set up emoji pickers for chat tabs on Facebook.
+ *
+ * Attaches a listener to the chat tabs so that when one is opened, an
+ * emoji picker is attached.
+ */
+const setupChatTabEmojiPicker = () => {
+  const chatTabs = document.querySelector("[id=ChatTabsPagelet]");
+
+  const callback = (mutations) => {
+    for (let mutation of mutations) {
+      for (let node of mutation.addedNodes) {
+        if (node.classList.contains("opened")) {
+          injectEmojiPicker(node);
+        }
+      }
+    }
+  };
+
+  const observer = new MutationObserver(callback);
+  const configurations = {
+    childList: true,
+    subtree: true,
+  };
+
+  observer.observe(chatTabs, configurations);
+};
+
+const hostname = window.location.hostname;
+const pathname = window.location.pathname;
+
+if (pathname.includes("/messages/") || hostname === "www.messenger.com") {
+  window.addEventListener("load", setupMessengerEmojiPicker);
+} else {
+  window.addEventListener("load", setupChatTabEmojiPicker);
+}
