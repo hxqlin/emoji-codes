@@ -111,7 +111,7 @@ class EmojiPicker extends Component {
     selection.empty();
     selection.addRange(range);
 
-    document.execCommand("insertText", true, emoji + " ");
+    document.execCommand("insertText", true, emoji);
 
     this.setState({
       activeEmojiIndex: 0,
