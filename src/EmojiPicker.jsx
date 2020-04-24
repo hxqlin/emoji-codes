@@ -380,22 +380,13 @@ class EmojiPicker extends Component {
    */
   _setupObserver() {
     const callback = (mutations) => {
-      const characterDataMutations = mutations.filter(
-        (m) => m.type === "characterData"
-      );
+      const maybeNewText = mutations[mutations.length - 1].target.textContent;
 
-      if (characterDataMutations.length) {
-        const maybeNewText =
-          characterDataMutations[characterDataMutations.length - 1].target
-            .textContent;
-
-        if (maybeNewText !== this.state.text) {
-          this.onEditorChange();
-
-          this.setState({
-            text: maybeNewText,
-          });
-        }
+      if (maybeNewText !== this.state.text) {
+        this.onEditorChange();
+        this.setState({
+          text: maybeNewText,
+        });
       }
     };
 
