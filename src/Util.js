@@ -1,3 +1,4 @@
 export const isWhitespace = (string) => {
-  return string.match(/[\s\uFEFF\xA0]/) !== null;
+  const whitespaceRegex = /[\s\uFEFF\xA0]/;
+  return whitespaceRegex.test(string);
 };
