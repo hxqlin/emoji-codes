@@ -113,6 +113,13 @@ class EmojiPicker extends Component {
 
     document.execCommand("insertText", true, emoji);
 
+    this.hideEmojiPicker();
+  }
+
+  /**
+   * Hides the emoji picker.
+   */
+  hideEmojiPicker() {
     this.setState({
       activeEmojiIndex: 0,
       emojis: [],
@@ -209,10 +216,7 @@ class EmojiPicker extends Component {
         }
 
         if (!this.isInEmojiCode(cursor, text)) {
-          this.setState({
-            activeEmojiIndex: 0,
-            emojis: [],
-          });
+          this.hideEmojiPicker();
         } else {
           this.setState({
             cursor: cursor,
@@ -234,10 +238,7 @@ class EmojiPicker extends Component {
           e.preventDefault();
           e.stopPropagation();
 
-          this.setState({
-            activeEmojiIndex: 0,
-            emojis: [],
-          });
+          this.hideEmojiPicker();
         }
     }
   }
