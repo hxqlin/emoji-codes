@@ -80,11 +80,15 @@ const setupChatTabEmojiPicker = () => {
   observer.observe(chatTabs, configurations);
 };
 
-const hostname = window.location.hostname;
-const pathname = window.location.pathname;
+const facebookRegex = /https:\/\/www.facebook.com\/*/;
+const messengerRegex1 = /https:\/\/www.facebook.com\/messages\/*/;
+const messengerRegex2 = /https:\/\/www.messenger.com\/*/;
+const href = window.location.href;
 
-if (pathname.includes("/messages/") || hostname === "www.messenger.com") {
+if (messengerRegex1.test(href) || messengerRegex2.test(href)) {
   window.addEventListener("load", setupMessengerEmojiPicker);
-} else {
+} else if (facebookRegex.test(href)) {
   window.addEventListener("load", setupChatTabEmojiPicker);
+} else {
+  throw new Error("Content script should not be running on this page");
 }
