@@ -1,0 +1,21 @@
+.emoji-picker {
+  box-sizing: border-box;
+  user-select: text;
+  width: 100%;
+  box-shadow: 0 0 0 1px lightgray, 0 4px 12px 0 rgba(0, 0, 0, 0.08);
+  background: white;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.4rem;
+  max-height: 220px;
+  max-width: max-content;
+  min-width: 400px;
+  overflow: hidden;
+  position: absolute;
+  z-index: 10;
+
+  &.-is-hidden {
+    display: none;
+  }
+}

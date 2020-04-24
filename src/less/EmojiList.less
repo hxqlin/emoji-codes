@@ -1,0 +1,23 @@
+.emoji-list {
+  color: black;
+  overflow-x: hidden;
+  overflow-y: auto;
+  text-align: left;
+  padding: 8px 0;
+
+  & ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+.emoji-list__item {
+  box-sizing: border-box;
+  cursor: pointer;
+  padding: 2px 6px;
+
+  &.-is-active {
+    background: rgba(0, 0, 0, 0.05);
+  }
+}

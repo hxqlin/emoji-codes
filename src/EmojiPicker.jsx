@@ -3,6 +3,7 @@ import { emojiIndex } from "emoji-mart-lite";
 import { isWhitespace } from "./Util";
 import EmojiList from "./EmojiList.jsx";
 import PropTypes from "prop-types";
+import "./less/EmojiPicker.less";
 
 const propTypes = {
   editor: PropTypes.object.isRequired,

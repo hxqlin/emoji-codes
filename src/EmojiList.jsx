@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import "./less/EmojiPicker.less";
 
 const propTypes = {
   activeEmojiIndex: PropTypes.number.isRequired,
