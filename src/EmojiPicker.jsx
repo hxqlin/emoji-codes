@@ -6,6 +6,7 @@ import PropTypes from "prop-types";
 
 const propTypes = {
   editor: PropTypes.object.isRequired,
+  parent: PropTypes.object,
 };
 
 /**
@@ -53,8 +54,8 @@ class EmojiPicker extends Component {
      * relative to other elements on the page and not just the emoji
      * picker height.
      */
-    if (this.props.chat) {
-      const chatHeight = this.props.chat.clientHeight;
+    if (this.props.parent) {
+      const chatHeight = this.props.parent.clientHeight;
       const emojiPickerHeight = this.emojiPicker.clientHeight;
       const top = chatHeight - emojiPickerHeight - 60;
 
@@ -412,7 +413,7 @@ class EmojiPicker extends Component {
     const showEmojis = this.state.emojis.length > 0;
     const emojiPickerStyle = {
       top: `${this.state.top}px`,
-      left: this.props.chat ? "32px" : 0,
+      left: this.props.parent ? "15%" : 0,
     };
 
     return (

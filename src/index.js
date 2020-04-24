@@ -7,16 +7,22 @@ import EmojiPicker from "./EmojiPicker";
 ReactDOM.render(<App />, document.getElementById("root"));
 
 const setupEmojiPicker = () => {
-  const chat = document.querySelector('div[role="main"]');
-  chat.style.position = "relative";
+  const currentMessage = document.querySelector(
+    "div[aria-label='New message']"
+  );
 
   const emojiContainer = document.createElement("div");
   emojiContainer.classList.add("emoji-container");
 
-  const editor = document.querySelector("div[contenteditable=true]");
+  const editor = document.querySelector(
+    "div[contenteditable=true][role=combobox]"
+  );
 
-  chat.appendChild(emojiContainer);
-  ReactDOM.render(<EmojiPicker editor={editor} />, emojiContainer);
+  currentMessage.appendChild(emojiContainer);
+  ReactDOM.render(
+    <EmojiPicker editor={editor} parent={currentMessage} />,
+    emojiContainer
+  );
 };
 
 window.addEventListener("load", setupEmojiPicker);
